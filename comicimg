@@ -2,24 +2,36 @@
 
 from PIL import Image
 from shaders import ComicShader
+from os.path import isfile
+from sys import stderr
+from sys import exit
 
 import argparse
 
-argparser = argparse.ArgumentParser(description = 'Add a comic book filter effect to an image.')
-argparser.add_argument('target', type = str, help = "Path comic book effect should be applied to.")
-argparser.add_argument('-o', '--out', type = str, default = None, help = "Path rendered image should be written to.  Defaults to value of 'in' argument if not given.")
-argparser.add_argument('-s', '--scale', type = int, default = 1)
-argparser.add_argument('-c', '--color', default = False, dest = 'color', action='store_true')
+
+argparser = argparse.ArgumentParser(description = 'Adds a comic book filter effect to an image.')
+argparser.add_argument('infile', type = str)
+argparser.add_argument('outfile', type = str, default = "", help = "Defaults the value of infile.")
+argparser.add_argument('-c', '--color', default = True, dest = 'mono', action='store_false')
+
 
 args = argparser.parse_args()
-if args.out == None:
-	args.out = args.target
+if args.outfile == "":
+	args.outfile = args.infile
 
+try:
+	image = Image.open(args.infile)
+except IOError as e:
+	if not isfile(args.infile):
+		stderr.writeln("No such file:  %s" % args.infile)
 
-input_image = Image.open(args.target)
+		exit(2)
+	else:
+		stderr.writeln(e.strerror)
 
-image = Image.new("RGBA", input_image.size, (0, 0, 0, 1))
-image.paste(input_image)
-for filter in [ComicShader(args.scale, args.color)]:
-	filter(image)
-image.save(args.out)
+		exit(2)
+
+target = Image.new("RGBA", image.size, None)
+target.paste(image)
+shader.apply(target)
+target.save(args.outfile)
