@@ -1,6 +1,13 @@
 from itertools import product
 
-def average(colors):
+def mix(colors):
+	"""
+	Mixes a list of rgb triplets.
+
+	@param iterable(rgb) colors List of colors to be mixed.
+
+	@return rgb The result of a numeric average of each channel's values.
+	"""
 	color_avg = (0, 0, 0)
 	for color in colors:
 		color_avg[0] += color[0]
@@ -13,20 +20,16 @@ def average(colors):
 	color_avg[2] /= length
 
 	return color_avg
-	
-class Color(object):
-	@staticmethod
-	def average(pixels, region = None):
-		average_color = [0, 0, 0, 0]
-		for point in product(xrange(region.left, region.right), xrange(region.top, region.bottom)):
-			for i in xrange(4):
-				average_color[i] += pixels[point[0], point[1]][i]
 
-		color_count = region.width * region.height
-		for i in xrange(4):
-			average_color[i] /= color_count
+def rgb(r, g, b):
+	"""
+	Makes an rgb triplet.
 
-		return Color(average_color)
+	@param numeric r Red channel value
+	@param numeric g Green channel value
+	@param numeric b Blue channel value
 
-	def __init__(self, rgba):
-		self.rgba = rgba
+	@return tuple(numeric, numeric, numeric) Returns a tuple containing, in
+	order, the red, green, and blue channel values.
+	"""
+	return (r, g, b)
