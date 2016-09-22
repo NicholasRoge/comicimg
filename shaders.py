@@ -1,55 +1,37 @@
-from color import Color
-from itertools import product
+from colorsys import hls_to_rgb
+from colorsys import rgb_to_hls
+from masks import CircleMask
 from region import Region
-from shapes import Circle
 
-import math
+import color
 
 class ComicShader():
-    def __init__(self, scale = 1, color = True):
-		self.color = color
+    def __init__(self, scale = 1, mono = True):
+		self.mono = mono
 		self.scale = scale
 
     def __call__(self, image):
-		diameter = int(10 * self.scale)
+		self.apply(image)
+
+    def apply(self, image):
 		pixels = image.load()
-		region = Region()
+        mask = CircleMask()
 
-		if diameter <= 0:
-			return
+        size = 10
+		for x in xrange(0, image.size[0], size):
+			for y in xrange(0, image.size[1], size):
+				mask.region.x = x;
+				mask.region.y = y;
+				mask.region.width = min(size, image.size[0] - region.x)
+				mask.region.height = min(size, image.size[1] - region.y)
 
-		for x in xrange(0, image.size[0], diameter):
-			for y in xrange(0, image.size[1], diameter):
-				region.x = x;
-				region.y = y;
-				region.width = min(diameter, image.size[0] - region.x)
-				region.height = min(diameter, image.size[1] - region.y)
+                color = color.average(image, region)
+                hls = rgb_to_hls(color)
 
-				self.dot(pixels, region, diameter)
+                mask.scale = hls[1]
+                if self.mono:
+                    hls[2] = 0
+                    color = hls_to_rgb(hls)
 
-    def dot(self, pixels, region, diameter, invert = False):
-		circle = Circle()
-		circle.diameter = diameter
-		circle.x = region.left
-		circle.y = region.top
-
-		dot_color = Color.average(pixels, region)
-
-		old_origin = circle.origin
-		lightness = 0.2126 * dot_color.rgba[0] + 0.7152 * dot_color.rgba[1] + 0.0722 * dot_color.rgba[2]
-		circle.diameter *= 0.25 + (1 - (lightness / 255)) * 0.75
-		circle.origin = old_origin
-
-		if not self.color:
-			for i in xrange(3):
-				dot_color.rgba[i] = int(lightness)
-
-		for point in product(xrange(region.left, region.right), xrange(region.top, region.bottom)):
-			opacity = 0
-			for corner in product((point[0], point[0] + 1), (point[1], point[1] + 1)):
-				if circle.contains(corner):
-					opacity += 0.25
-
-			color = dot_color.rgba[0:3]
-			color.append(int(dot_color.rgba[3] * (opacity * 255)))
-			pixels[point[0], point[1]] = tuple(color)
+                image.paste(color, tuple(mask.region))
+                mask.apply(image)
