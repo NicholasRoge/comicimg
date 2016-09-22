@@ -1,44 +1,41 @@
 from region import Region
 
 class Mask(object):
-    def __init__(self, region = Region()):
-        self.region = region
-        self.invert = False
-
     # Magic shit may happen because of the next few methods.
     # Leave with the knowledge that they're here, that you may better fight the
     # dragons they spawn.
-    def __call__(self, image):
-        self.apply(image)
+    def __call__(self, image, region = None, invert = False):
+        self.apply(image, image, region, invert)
 
-    def apply(self, image):
+    def apply(self, image, region = None, invert = False):
         """
         Applies the mask to the given image.
 
         @param Image image
         """
-        pixels = image.load()
-        for x in xrange(self.region.left, self.region.right):
-            for y in xrange(self.region.top, self.region.bottom):
-                pixel = pixels[x, y]
+        if region == None:
+            region = (0, 0, image.size[0], image.size[1])
 
-                interp_x = float(x) / image.size[0]
-                interp_y = float(y) / image.size[1]
+        for pixel, x, y in irange(image, region):
+            pixel = pixels[x, y]
 
-                opacity = self.test(pixel, interp_x, interp_y)
-                if self.invert:
-                    opacity = 1.0 - opacity
+            interp_x = float(x) / image.size[0]
+            interp_y = float(y) / image.size[1]
 
-                pixel[3] *= opacity
+            opacity = self.test(pixel, interp_x, interp_y)
+            if self.invert:
+                opacity = 1.0 - opacity
 
-                pixels[x, y] = pixel
+            pixel[3] *= opacity
+
+            pixels[x, y] = pixel
 
     def test(color, interp_x, interp_y):
         return 1.0
 
 
 class CircleMask(Mask):
-    def __init__(self, scale = 1.0, region = Region()):
+    def __init__(self, scale = 1.0, region = None):
         super(self).__init__(region)
 
         self.scale = scale
