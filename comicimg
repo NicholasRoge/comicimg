@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-#from PIL import Image
+from PIL import Image
 from sys import stderr
 from sys import exit
-from util import irange
+from os.path import isfile
 
 import argparse
 import shaders
@@ -12,6 +12,8 @@ argparser = argparse.ArgumentParser(description = 'Adds a comic book filter effe
 argparser.add_argument('infile', type = str)
 argparser.add_argument('outfile', type = str, default = "", help = "Defaults to the value of infile.")
 argparser.add_argument('-c', '--color', default = True, dest = 'mono', action='store_false')
+argparser.add_argument('-d', '--dot-size', type = int, default = 10, dest = 'dot_size')
+argparser.add_argument('-n', '--coefficient', type = float, default = 1.0, dest = 'coefficient')
 
 args = argparser.parse_args()
 if args.outfile == "":
@@ -22,15 +24,15 @@ try:
 	image = Image.open(args.infile)
 except IOError as e:
 	if not isfile(args.infile):
-		stderr.writeln("No such file:  %s" % args.infile)
+		stderr.write("No such file:  %s\n" % args.infile)
 
 		exit(2)
 	else:
-		stderr.writeln(e.strerror)
+		stderr.write("%s\n" % e.strerror)
 
 		exit(2)
 
 target = Image.new("RGBA", image.size, None)
 target.paste(image)
-shaders.comicimg(image, args.mono)
+shaders.comicimg(target, mono = args.mono, size = args.dot_size, c = args.coefficient)
 target.save(args.outfile)
