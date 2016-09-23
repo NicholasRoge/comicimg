@@ -2,6 +2,20 @@
 
 Command to apply a comic filter to a specified image.
 
+## Example Output
+
+```
+comicimg --color --size 5 in.jpg out.png
+```
+
+in.jpg
+
+![in.jpg](examples/forest/in.jpg)
+
+out.jpg
+![out.jpg](examples/forest/out.png)
+
+
 ## How to Use
 
 ```
