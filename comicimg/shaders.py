@@ -9,7 +9,7 @@ from region import Region
 import color
 
 
-def comicimg(image, mono = True, size = 10, c = 1.0):
+def comicimg(image, mono = True, size = 10):
     pixels = image.load()
     mask = CircleMask()
 

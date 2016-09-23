@@ -1,7 +1,7 @@
 def pixels(image, region = None):
     """
     Iterates over all or, optionally, only a single region of an image, yielding
-    triplet containing each pixel's color, x position, and y position.
+    a triplet containing each pixel's color, x position, and y position.
 
     @param Image image Image to iterate over.
     @param iterable region Region to constrain iteration to.
@@ -13,7 +13,7 @@ def pixels(image, region = None):
         Y = xrange(image.height)
     else:
         X = xrange(region[0], region[2])
-        Y = xrange(region[1], region[3]);
+        Y = xrange(region[1], region[3])
 
     data = image.load()
     for x in X:
@@ -22,6 +22,13 @@ def pixels(image, region = None):
 
 def colors(image, region = None):
     """
+    Iterates over all or, optionally, only a single region of an image, yielding
+    a each pixel's color as a tuple.
+
+    @param Image image Image to iterate over.
+    @param iterablee region Region to contrain iteration to.
+
+    @return generator(tuple(r, g, b, a))
     """
     for pixel in pixels(image, region):
         yield pixel[0]

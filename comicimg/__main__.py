@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from PIL import Image
 from sys import stderr
 from sys import exit
@@ -8,14 +6,37 @@ from os.path import isfile
 import argparse
 import shaders
 
-argparser = argparse.ArgumentParser(description = 'Adds a comic book filter effect to an image.')
-argparser.add_argument('infile', type = str, help = "File to apply the filter effect to.")
-argparser.add_argument('outfile', type = str, default = "", nargs = '?', help = "Defaults to the value of infile.")
-argparser.add_argument('-c', '--color', default = True, dest = 'mono', action='store_false', help="Flag indicating image should be rendered in color.")
-argparser.add_argument('-s', '--size', type = int, default = 10, dest = 'size')
+argparser = argparse.ArgumentParser(
+	description = 'Applies a comic book filter effect to an image.'
+)
+argparser.add_argument(
+	'-c', '--color',
+	dest = 'mono',
+	default = True,
+	action='store_false',
+	help="render the image in color"
+)
+argparser.add_argument(
+	'-s', '--size',
+	dest = 'size',
+	type = int,
+	default = 10,
+	help = "diameter of the 'circles' in pixels"
+)
+argparser.add_argument(
+	'infile',
+	type = str,
+	help = "file to apply the filter effect to"
+)
+argparser.add_argument(
+	'outfile',
+	type = str,
+	nargs = '?',
+	help = "file or path to store the modified image"
+)
 
 args = argparser.parse_args()
-if args.outfile == "":
+if not args.outfile:
 	args.outfile = args.infile
 
 

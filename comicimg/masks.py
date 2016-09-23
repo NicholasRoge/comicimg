@@ -1,6 +1,7 @@
 from helpers import pixels
 from region import Region
 
+
 class Mask(object):
     # Magic shit may happen because of the next few methods.
     # Leave with the knowledge that they're here, that you may better fight the
